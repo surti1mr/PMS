@@ -1,0 +1,24 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key-change-this-in-production'
+    
+    # Database configuration
+    DB_HOST = os.environ.get('DB_HOST') or 'your-db-host'
+    DB_PORT = int(os.environ.get('DB_PORT') or 3306)
+    DB_NAME = os.environ.get('DB_NAME') or 'your-db-name'
+    DB_USER = os.environ.get('DB_USER') or 'your-db-user'
+    DB_PASSWORD = os.environ.get('DB_PASSWORD') or 'your-db-password'
+    
+    # SQLAlchemy configuration
+    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'connect_args': {'charset': 'utf8mb4'}
+    }
+

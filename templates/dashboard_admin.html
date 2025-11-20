@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Flask App{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Top Header with Hamburger and PMS -->
+    <div class="top-header">
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        <h1 class="app-title">Open-Mic Participation Management System</h1>
+        {% if current_user %}
+        <div class="user-greeting">Hi, {{ current_user.first_name }}</div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    {% from 'sidebar_macros.html' import render_sidebar %}
+    {{ render_sidebar('dashboard') }}
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1>Admin Dashboard</h1>
+            <p>System Overview & Statistics</p>
+        </div>
+        
+        <div class="content-body">
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 1400px; margin: 0 auto; padding: 20px 0;">
+                <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; transition: all 0.3s ease; min-height: 180px;">
+                    <div style="font-size: 48px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">👥</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <h3 style="font-size: 42px; font-weight: 700; color: #667eea; margin: 0 0 8px 0; line-height: 1;">{{ stats.total_admins }}</h3>
+                        <p style="font-size: 16px; color: #4a5568; font-weight: 500; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Administrators</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; transition: all 0.3s ease; min-height: 180px;">
+                    <div style="font-size: 48px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">🎯</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <h3 style="font-size: 42px; font-weight: 700; color: #667eea; margin: 0 0 8px 0; line-height: 1;">{{ stats.total_event_managers }}</h3>
+                        <p style="font-size: 16px; color: #4a5568; font-weight: 500; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Event Managers</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; transition: all 0.3s ease; min-height: 180px;">
+                    <div style="font-size: 48px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">👤</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <h3 style="font-size: 42px; font-weight: 700; color: #667eea; margin: 0 0 8px 0; line-height: 1;">{{ stats.total_participants }}</h3>
+                        <p style="font-size: 16px; color: #4a5568; font-weight: 500; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Participants</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; transition: all 0.3s ease; min-height: 180px;">
+                    <div style="font-size: 48px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">📅</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <h3 style="font-size: 42px; font-weight: 700; color: #667eea; margin: 0 0 8px 0; line-height: 1;">{{ stats.total_events }}</h3>
+                        <p style="font-size: 16px; color: #4a5568; font-weight: 500; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Total Events</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; transition: all 0.3s ease; min-height: 180px;">
+                    <div style="font-size: 48px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">⏰</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <h3 style="font-size: 42px; font-weight: 700; color: #667eea; margin: 0 0 8px 0; line-height: 1;">{{ stats.upcoming_events }}</h3>
+                        <p style="font-size: 16px; color: #4a5568; font-weight: 500; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Upcoming Events</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    sidebar.classList.toggle('sidebar-open');
+    hamburgerBtn.classList.toggle('hamburger-active');
+    const isOpen = sidebar.classList.contains('sidebar-open');
+    sessionStorage.setItem('sidebarOpen', isOpen);
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    sidebar.classList.remove('sidebar-open');
+    hamburgerBtn.classList.remove('hamburger-active');
+    sessionStorage.setItem('sidebarOpen', false);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const sidebarOpen = sessionStorage.getItem('sidebarOpen');
+    if (sidebarOpen === 'true') {
+        sidebar.classList.add('sidebar-open');
+        hamburgerBtn.classList.add('hamburger-active');
+    }
+});
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const navLinks = document.querySelectorAll('.nav-link');
+    let isNavLink = false;
+    navLinks.forEach(link => { if (link.contains(event.target)) { isNavLink = true; } });
+    if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target) && !isNavLink) {
+        sidebar.classList.remove('sidebar-open');
+        hamburgerBtn.classList.remove('hamburger-active');
+        sessionStorage.setItem('sidebarOpen', false);
+    }
+});
+</script>
+{% endblock %}
+

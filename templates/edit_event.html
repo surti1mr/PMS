@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Event - Flask App{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Top Header with Hamburger and PMS -->
+    <div class="top-header">
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        <h1 class="app-title">Open-Mic Participation Management System</h1>
+        {% if current_user %}
+        <div class="user-greeting">Hi, {{ current_user.first_name }}</div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    {% from 'sidebar_macros.html' import render_sidebar %}
+    {{ render_sidebar('events') }}
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1>Edit Event</h1>
+            <p>Update event details</p>
+        </div>
+        
+        <div class="content-body">
+            <div style="width:100%;max-width:800px;margin:0 auto;">
+                <div class="event-card" style="padding:32px;">
+                    {% if error %}
+                    <div class="error-message" style="margin-bottom:24px;">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="POST" action="{{ url_for('edit_event', event_id=event.event_id) }}">
+                        <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;row-gap:20px;align-items:center;margin-bottom:24px;">
+                            <label for="event_name"><strong>Event Name *</strong></label>
+                            <input id="event_name" name="event_name" type="text" value="{{ event.event_name if event.event_name else (request.form.event_name if request.form else '') }}" required 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                            
+                            <label for="event_type_id"><strong>Event Type *</strong></label>
+                            <select id="event_type_id" name="event_type_id" required 
+                                    style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                                <option value="">Select Event Type</option>
+                                {% for event_type in event_types %}
+                                <option value="{{ event_type.event_type_id }}" 
+                                        {{ 'selected' if (event.event_type_id == event_type.event_type_id) or (request.form and request.form.event_type_id == event_type.event_type_id|string) else '' }}>
+                                    {{ event_type.type_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            
+                            <label for="event_status_id"><strong>Event Status *</strong></label>
+                            <select id="event_status_id" name="event_status_id" required 
+                                    style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                                <option value="">Select Event Status</option>
+                                {% for event_status in event_statuses %}
+                                <option value="{{ event_status.event_status_id }}"
+                                        {{ 'selected' if (event.event_status_id == event_status.event_status_id) or (request.form and request.form.event_status_id == event_status.event_status_id|string) else '' }}>
+                                    {{ event_status.status_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            
+                            <label for="event_date"><strong>Event Date *</strong></label>
+                            <input id="event_date" name="event_date" type="date" value="{{ event_date_str if event_date_str else (request.form.event_date if request.form else '') }}" required 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                            
+                            <label for="event_time"><strong>Event Time</strong></label>
+                            <input id="event_time" name="event_time" type="time" value="{{ event_time_str if event_time_str else (request.form.event_time if request.form else '') }}" 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                            
+                            <label for="location"><strong>Location</strong></label>
+                            <input id="location" name="location" type="text" value="{{ event.location if event.location else (request.form.location if request.form else '') }}" 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                            
+                            <label for="total_spots"><strong>Total Spots</strong></label>
+                            <input id="total_spots" name="total_spots" type="number" min="1" value="{{ event.total_spots if event.total_spots else (request.form.total_spots if request.form else '') }}" 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                            
+                            <label for="registration_deadline_date"><strong>Registration Deadline Date</strong></label>
+                            <input id="registration_deadline_date" name="registration_deadline_date" type="date" value="{{ registration_deadline_date_str if registration_deadline_date_str else (request.form.registration_deadline_date if request.form else '') }}" 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                            
+                            <label for="registration_deadline_time"><strong>Registration Deadline Time</strong></label>
+                            <input id="registration_deadline_time" name="registration_deadline_time" type="time" value="{{ registration_deadline_time_str if registration_deadline_time_str else (request.form.registration_deadline_time if request.form else '') }}" 
+                                   style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;">
+                        </div>
+                        
+                        <div style="margin-bottom:24px;">
+                            <label for="event_description"><strong>Event Description</strong></label>
+                            <textarea id="event_description" name="event_description" rows="5" 
+                                      style="padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;width:100%;margin-top:8px;font-family:inherit;resize:vertical;">{{ event.event_description if event.event_description else (request.form.event_description if request.form else '') }}</textarea>
+                        </div>
+                        
+                        <div style="display:flex;gap:16px;justify-content:flex-end;">
+                            <a href="{{ url_for('event_detail', event_id=event.event_id) }}" class="btn-secondary" style="text-decoration:none;display:inline-block;">Cancel</a>
+                            <button type="submit" class="btn-primary">Update Event</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    sidebar.classList.toggle('sidebar-open');
+    hamburgerBtn.classList.toggle('hamburger-active');
+    const isOpen = sidebar.classList.contains('sidebar-open');
+    sessionStorage.setItem('sidebarOpen', isOpen);
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    sidebar.classList.remove('sidebar-open');
+    hamburgerBtn.classList.remove('hamburger-active');
+    sessionStorage.setItem('sidebarOpen', false);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const sidebarOpen = sessionStorage.getItem('sidebarOpen');
+    if (sidebarOpen === 'true') {
+        sidebar.classList.add('sidebar-open');
+        hamburgerBtn.classList.add('hamburger-active');
+    }
+});
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const navLinks = document.querySelectorAll('.nav-link');
+    let isNavLink = false;
+    navLinks.forEach(link => { if (link.contains(event.target)) { isNavLink = true; } });
+    if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target) && !isNavLink) {
+        sidebar.classList.remove('sidebar-open');
+        hamburgerBtn.classList.remove('hamburger-active');
+        sessionStorage.setItem('sidebarOpen', false);
+    }
+});
+</script>
+{% endblock %}
+

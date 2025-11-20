@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Upcoming Events - Flask App{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Top Header with Hamburger and PMS -->
+    <div class="top-header">
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+        <h1 class="app-title">Open-Mic Participation Management System</h1>
+        {% if current_user %}
+        <div class="user-greeting">Hi, {{ current_user.first_name }}</div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    {% from 'sidebar_macros.html' import render_sidebar %}
+    {{ render_sidebar('upcoming_events') }}
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1>Upcoming Events</h1>
+            <p>Events happening soon</p>
+        </div>
+        
+        <!-- Search Form - Centered below header -->
+        <div style="margin:0 auto 32px auto;max-width:600px;width:100%;">
+            <form method="GET" action="{{ url_for('upcoming_events') }}" style="display:flex;gap:12px;align-items:center;width:100%;">
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Search events by name..." 
+                       style="flex:1;padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;">
+                <button type="submit" class="btn-primary" style="padding:12px 24px;white-space:nowrap;">Search</button>
+                {% if search_query %}
+                <a href="{{ url_for('upcoming_events') }}" class="btn-secondary" style="text-decoration:none;padding:12px 24px;white-space:nowrap;">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <div class="content-body">
+            {% if events %}
+                <div class="events-grid">
+                    {% for event in events %}
+                    <div class="event-card">
+                        <div class="event-header">
+                            <h3 class="event-name">{{ event.event_name }}</h3>
+                            <span class="event-date">{{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                        </div>
+                        <div class="event-details">
+                            <p class="event-description">{{ event.event_description or 'No description available' }}</p>
+                            <p class="event-location">📍 {{ event.location or 'Location TBD' }}</p>
+                            {% if event.total_spots %}
+                            <p class="event-spots">🎫 {{ event.total_spots }} spots available</p>
+                            {% endif %}
+                            {% if event.registration_deadline %}
+                            <p class="event-deadline">⏰ Registration deadline: {{ event.registration_deadline.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="event-actions">
+                            {% if session.user_type|lower == 'participant' %}
+                            <a href="{{ url_for('register_event', event_id=event.event_id) }}" class="btn-register" style="text-decoration:none;display:inline-block;text-align:center;">Register</a>
+                            {% else %}
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <button class="btn-register" onclick="viewEventDetails({{ event.event_id }})">View Details</button>
+                                {% if session.user_type|lower == 'event_manager' or session.user_type|lower == 'admin' %}
+                                <button class="icon-btn edit-btn" onclick="editEvent({{ event.event_id }})" title="Edit Event" style="margin-left:8px;">
+                                    ✏️
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="welcome-card">
+                    <h2>No Upcoming Events</h2>
+                    <p>{% if search_query %}No upcoming events match your search "{{ search_query }}".{% else %}There are currently no upcoming events scheduled. Check back later for new events!{% endif %}</p>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('events') }}" class="btn-primary">View All Events</a>
+                        {% if search_query %}
+                        <a href="{{ url_for('upcoming_events') }}" class="btn-secondary">Clear Search</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Pagination - Centered at bottom -->
+        {% if pagination and pagination.pages > 1 %}
+        <div class="pagination-container" style="margin-top:32px;display:flex;flex-direction:column;align-items:center;width:100%;">
+            <div class="pagination-info" style="text-align:center;margin-bottom:16px;padding-top:15px;">
+                Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page < pagination.total else pagination.total }} of {{ pagination.total }} upcoming event{% if pagination.total != 1 %}s{% endif %}
+                {% if search_query %}
+                matching "{{ search_query }}"
+                {% endif %}
+            </div>
+            <div class="pagination" style="display:flex;justify-content:center;text-align:center;padding-top:15px;">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for('upcoming_events', page=1, search=search_query if search_query else '') }}" class="pagination-btn" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;" title="First Page">««</a>
+                    <a href="{{ url_for('upcoming_events', page=pagination.prev_num, search=search_query if search_query else '') }}" class="pagination-btn" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;" title="Previous">‹</a>
+                {% else %}
+                    <span class="pagination-btn disabled" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;">««</span>
+                    <span class="pagination-btn disabled" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;">‹</span>
+                {% endif %}
+                
+                {% for page_num in range([1, pagination.page - 2]|max, [pagination.pages + 1, pagination.page + 3]|min) %}
+                    {% if page_num == pagination.page %}
+                        <span class="pagination-btn active" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;">{{ page_num }}</span>
+                    {% else %}
+                        <a href="{{ url_for('upcoming_events', page=page_num, search=search_query if search_query else '') }}" class="pagination-btn" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;">{{ page_num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pagination.has_next %}
+                    <a href="{{ url_for('upcoming_events', page=pagination.next_num, search=search_query if search_query else '') }}" class="pagination-btn" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;" title="Next">›</a>
+                    <a href="{{ url_for('upcoming_events', page=pagination.pages, search=search_query if search_query else '') }}" class="pagination-btn" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;" title="Last Page">»»</a>
+                {% else %}
+                    <span class="pagination-btn disabled" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;">›</span>
+                    <span class="pagination-btn disabled" style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:all 0.3s ease;">»»</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    
+    sidebar.classList.toggle('sidebar-open');
+    hamburgerBtn.classList.toggle('hamburger-active');
+    
+    // Save sidebar state to session storage
+    const isOpen = sidebar.classList.contains('sidebar-open');
+    sessionStorage.setItem('sidebarOpen', isOpen);
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    
+    sidebar.classList.remove('sidebar-open');
+    hamburgerBtn.classList.remove('hamburger-active');
+    sessionStorage.setItem('sidebarOpen', false);
+}
+
+// Restore sidebar state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const sidebarOpen = sessionStorage.getItem('sidebarOpen');
+    
+    if (sidebarOpen === 'true') {
+        sidebar.classList.add('sidebar-open');
+        hamburgerBtn.classList.add('hamburger-active');
+    }
+});
+
+// Close sidebar when clicking outside (but not on menu items)
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    // Check if click is on a navigation link
+    let isNavLink = false;
+    navLinks.forEach(link => {
+        if (link.contains(event.target)) {
+            isNavLink = true;
+        }
+    });
+    
+    // Only close sidebar if clicking outside sidebar and hamburger button, and not on nav links
+    if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target) && !isNavLink) {
+        sidebar.classList.remove('sidebar-open');
+        hamburgerBtn.classList.remove('hamburger-active');
+        sessionStorage.setItem('sidebarOpen', false);
+    }
+});
+
+// View event details function
+function viewEventDetails(eventId) {
+    window.location.href = `/events/${eventId}`;
+}
+
+// Edit event function
+function editEvent(eventId) {
+    window.location.href = `/edit_event/${eventId}`;
+}
+</script>
+{% endblock %}

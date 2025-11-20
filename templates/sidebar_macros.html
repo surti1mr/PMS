@@ -1,0 +1,129 @@
+{% macro render_sidebar(current_page) %}
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2>PMS</h2>
+        <button class="close-btn" onclick="closeSidebar()">
+            <span class="close-icon">×</span>
+        </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <ul class="nav-list">
+            {% if session.user_type == 'admin' %}
+                <!-- Admin Sidebar -->
+                <li class="nav-item {{ 'active' if current_page == 'dashboard' else '' }}">
+                    <a href="{{ url_for('home') }}" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'add_event_manager' else '' }}">
+                    <a href="{{ url_for('add_event_manager') }}" class="nav-link">
+                        <span class="nav-icon">➕</span>
+                        <span class="nav-text">Add Event Manager</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'all_event_managers' else '' }}">
+                    <a href="{{ url_for('all_event_managers') }}" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">All Event Managers</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'all_participants' else '' }}">
+                    <a href="{{ url_for('all_participants') }}" class="nav-link">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-text">All Participants</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'events' else '' }}">
+                    <a href="{{ url_for('events') }}" class="nav-link">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-text">All Events</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'profile' else '' }}">
+                    <a href="{{ url_for('profile') }}" class="nav-link">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+                
+            {% elif session.user_type == 'event_manager' %}
+                <!-- Event Manager Sidebar -->
+                <li class="nav-item {{ 'active' if current_page == 'dashboard' else '' }}">
+                    <a href="{{ url_for('home') }}" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'add_event' else '' }}">
+                    <a href="{{ url_for('add_event') }}" class="nav-link">
+                        <span class="nav-icon">➕</span>
+                        <span class="nav-text">Add Event</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'events' else '' }}">
+                    <a href="{{ url_for('events') }}" class="nav-link">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-text">My Events</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'upcoming_events' else '' }}">
+                    <a href="{{ url_for('upcoming_events') }}" class="nav-link">
+                        <span class="nav-icon">⏰</span>
+                        <span class="nav-text">Upcoming Events</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'profile' else '' }}">
+                    <a href="{{ url_for('profile') }}" class="nav-link">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+                
+            {% else %}
+                <!-- Participant Sidebar -->
+                <li class="nav-item {{ 'active' if current_page == 'dashboard' else '' }}">
+                    <a href="{{ url_for('home') }}" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'events' else '' }}">
+                    <a href="{{ url_for('events') }}" class="nav-link">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-text">All Events</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'upcoming_events' else '' }}">
+                    <a href="{{ url_for('upcoming_events') }}" class="nav-link">
+                        <span class="nav-icon">⏰</span>
+                        <span class="nav-text">Upcoming Events</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'registered_events' else '' }}">
+                    <a href="{{ url_for('registered_events') }}" class="nav-link">
+                        <span class="nav-icon">✅</span>
+                        <span class="nav-text">My Registrations</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ 'active' if current_page == 'profile' else '' }}">
+                    <a href="{{ url_for('profile') }}" class="nav-link">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+            {% endif %}
+            
+            <!-- Logout (same for all roles) -->
+            <li class="nav-item logout-item">
+                <a href="{{ url_for('logout') }}" class="nav-link logout-link">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+{% endmacro %}
+
