@@ -21,6 +21,7 @@ Project/
 ├── auth.py                # Authentication utilities
 ├── api.py                 # REST API endpoints
 ├── config.py              # Configuration (uses environment variables)
+├── database_schema.sql    # Database structure/schema file (MySQL)
 ├── requirements.txt       # Python dependencies
 ├── templates/             # HTML templates
 │   ├── base.html
@@ -92,7 +93,25 @@ pip install -r requirements.txt
 
 ### 5. Initialize the Database
 
-The application will automatically create tables on first run if they don't exist.
+You have two options to set up the database:
+
+**Option A: Using the provided schema file (Recommended)**
+
+1. Create your MySQL database:
+   ```bash
+   mysql -u your-db-user -p
+   CREATE DATABASE your-db-name;
+   EXIT;
+   ```
+
+2. Run the schema file to create all tables:
+   ```bash
+   mysql -u your-db-user -p your-db-name < database_schema.sql
+   ```
+
+**Option B: Automatic table creation**
+
+The application will automatically create tables on first run if they don't exist (using SQLAlchemy models).
 
 ### 6. Run the Application
 
