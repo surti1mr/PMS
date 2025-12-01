@@ -268,9 +268,6 @@ The application uses environment variables for configuration. Make sure to:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
-
-[Specify your license here]
 
 ## Support
 
