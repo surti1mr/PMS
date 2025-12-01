@@ -2,12 +2,18 @@
 # Stand-Up Comedy Event Participation Management System
 # Database Schema Structure (MySQL)
 # 
-# This file contains only the database structure:
+# This file contains:
 # - Drop tables (children first)
 # - Create tables (PKs, FKs, constraints)
 # - Indexes and additional constraints
+# - Reference data (event types, event statuses, registration statuses)
+# - Default admin user for initial system access
 # 
-# Note: This file does NOT contain any INSERT statements.
+# Default Admin Credentials:
+# Email: admin@comedyorg.com
+# Password: admin123
+# 
+# IMPORTANT: Change the default password after first login!
 # =============================================================
 
 # ---------------------------
@@ -160,6 +166,42 @@ CREATE INDEX idx_event_type ON event(event_type_id);
 CREATE INDEX idx_reg_event ON registration(event_id);
 CREATE INDEX idx_reg_participant ON registration(participant_id);
 CREATE INDEX idx_reg_status ON registration(registration_status_id);
+
+# ---------------------------
+# 5) Insert reference data and default admin user
+# ---------------------------
+
+# Insert basic event types
+INSERT INTO event_type (type_name, type_description) VALUES
+('Stand-Up Comedy - Main Stage', 'Stand-up comedy show — main stage'),
+('Stand-Up Comedy - Open Mic', 'Open mic comedy night for new comedians'),
+('Stand-Up Comedy - College Night', 'Comedy night hosted at college venues');
+
+# Insert basic event statuses
+INSERT INTO event_status (status_name, status_description) VALUES
+('Scheduled', 'Event scheduled'),
+('Published', 'Event published and visible'),
+('Registration Open', 'Registrations are open'),
+('Registration Closed', 'Registrations closed'),
+('Sold Out', 'No tickets available'),
+('Completed', 'Event completed'),
+('Cancelled', 'Event cancelled');
+
+# Insert basic registration statuses
+INSERT INTO registration_status (status_name, status_description) VALUES
+('Pending', 'Awaiting manager confirmation'),
+('Confirmed', 'Confirmed by event manager'),
+('Rejected', 'Rejected by event manager'),
+('Cancelled', 'Cancelled by participant'),
+('Waitlisted', 'Placed on waitlist'),
+('NoShow', 'Participant did not attend');
+
+# Insert default admin user
+# Email: admin@comedyorg.com
+# Password: admin123
+# Note: Change this password after first login for security
+INSERT INTO admin (role, email, password_hash, first_name, last_name, phone_number, is_active) VALUES
+('super_admin', 'admin@comedyorg.com', 'scrypt:32768:8:1$J6hwzgwncKtceaSw$f542349df2bf10d85e4e1ef9aca63a81fb1a7c7b3fc65ca27102b380207b9bcec049fe2c999a97ff2f26ac4ec1d7f5ebb9b881032b022f4b7afb4870d8abd79c', 'System', 'Administrator', NULL, TRUE);
 
 # ---------------------------
 # End of schema structure

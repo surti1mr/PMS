@@ -104,7 +104,7 @@ You have two options to set up the database:
    EXIT;
    ```
 
-2. Run the schema file to create all tables:
+2. Run the schema file to create all tables and default admin user:
    ```bash
    mysql -u your-db-user -p your-db-name < database_schema.sql
    ```
@@ -113,6 +113,8 @@ You have two options to set up the database:
 
 The application will automatically create tables on first run if they don't exist (using SQLAlchemy models).
 
+**Note:** If using Option A, a default admin user is created automatically. See "Initial Setup & User Creation" section below.
+
 ### 6. Run the Application
 
 ```bash
@@ -120,6 +122,79 @@ python app.py
 ```
 
 The application will be available at `http://localhost:5000`
+
+### 7. Initial Setup & User Creation
+
+After setting up the database, follow these steps to get started:
+
+**Step 1: Login as Default Admin**
+
+If you used the database schema file (Option A), a default admin user is already created:
+
+- **Email:** `admin@comedyorg.com`
+- **Password:** `admin123`
+
+⚠️ **Important:** Change this password after first login for security!
+
+1. Navigate to `http://localhost:5000`
+2. Click on "Login"
+3. Enter the admin credentials above
+4. You'll be redirected to the Admin Dashboard
+
+**Step 2: Create Event Managers**
+
+Once logged in as admin:
+
+1. From the Admin Dashboard, navigate to "Event Managers" section
+2. Click "Add New Event Manager"
+3. Fill in the required details:
+   - First Name, Last Name
+   - Email (must be unique)
+   - Phone Number (optional)
+   - Password
+4. Click "Create Event Manager"
+5. The new event manager can now login and create events
+
+**Step 3: Create Participants (Optional)**
+
+Participants can be created in two ways:
+
+**Option A: By Event Manager (Recommended)**
+- Event Managers can create participant accounts from their dashboard
+- Navigate to "Participants" section → "Add New Participant"
+
+**Option B: Self-Registration**
+- Participants can sign up themselves by clicking "Sign Up" on the login page
+- They will need to provide their details and create an account
+
+**Step 4: Create Events**
+
+1. Login as an Event Manager (created in Step 2)
+2. From the Event Manager Dashboard, click "Create Event"
+3. Fill in event details:
+   - Event Name, Description
+   - Event Date and Time
+   - Location
+   - Total Spots Available
+   - Registration Deadline
+   - Event Type and Status
+4. Click "Create Event"
+5. Participants can now register for this event
+
+**Step 5: Manage Registrations**
+
+- Event Managers can view all registrations for their events
+- They can approve, reject, or manage participant registrations
+- Participants will see their registration status in their dashboard
+
+**User Creation Workflow Summary:**
+```
+Admin (default) → Creates Event Managers → Event Managers create Events
+                                                      ↓
+                                    Participants register for Events
+                                                      ↓
+                                    Event Managers manage Registrations
+```
 
 ## API Endpoints
 
