@@ -155,17 +155,13 @@ Once logged in as admin:
 4. Click "Create Event Manager"
 5. The new event manager can now login and create events
 
-**Step 3: Create Participants (Optional)**
+**Step 3: Create Participants**
 
-Participants can be created in two ways:
+Participants must register themselves through self-registration:
 
-**Option A: By Event Manager (Recommended)**
-- Event Managers can create participant accounts from their dashboard
-- Navigate to "Participants" section → "Add New Participant"
-
-**Option B: Self-Registration**
-- Participants can sign up themselves by clicking "Sign Up" on the login page
-- They will need to provide their details and create an account
+- Participants can sign up by clicking "Sign Up" on the login page
+- They will need to provide their details (name, email, password, etc.) and create an account
+- Once registered, participants can login and browse available events
 
 **Step 4: Create Events**
 
